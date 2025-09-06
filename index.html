@@ -143,12 +143,15 @@
   import { getAuth, checkActionCode, applyActionCode } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
   // ⚠️ USA la config del progetto dove crei gli utenti (stessa dell'app Android)
-  const firebaseConfig = {
-    apiKey: "TUO_API_KEY",
-    authDomain: "TUO_PROJECT_ID.firebaseapp.com",
-    projectId: "TUO_PROJECT_ID",
-    appId: "TUO_APP_ID"
-  };
+  // Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyD44-_QQ63SD-JVBGm2AwtPCl1ahHD2FrQ",
+  authDomain: "esame-9aa37.firebaseapp.com",
+  projectId: "esame-9aa37",
+  storageBucket: "esame-9aa37.firebasestorage.app",
+  messagingSenderId: "1041503427752",
+  appId: "1:1041503427752:web:337b2e422ba5f895a2f69d"
+};
 
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
