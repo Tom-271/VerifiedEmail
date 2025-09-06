@@ -138,39 +138,52 @@
     <footer>Il tuo team è sempre a disposizione! © INGEFIT</footer>
   </div>
 
-  <!-- ✅ Verifica effettiva del link (applica l'oobCode) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import { getAuth, applyActionCode } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import { getAuth, checkActionCode, applyActionCode } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
-    // ⬇️ Inserisci la config del TUO progetto (stessa dell'app Android)
-    const firebaseConfig = {
-      apiKey: "TUO_API_KEY",
-      authDomain: "TUO_PROJECT_ID.firebaseapp.com",
-      projectId: "TUO_PROJECT_ID",
-      appId: "TUO_APP_ID"
-    };
+  // ⚠️ USA la config del progetto dove crei gli utenti (stessa dell'app Android)
+  const firebaseConfig = {
+    apiKey: "TUO_API_KEY",
+    authDomain: "TUO_PROJECT_ID.firebaseapp.com",
+    projectId: "TUO_PROJECT_ID",
+    appId: "TUO_APP_ID"
+  };
 
-    const app  = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    auth.languageCode = 'it';
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  auth.languageCode = 'it';
 
-    const p = new URLSearchParams(location.search);
-    const mode = p.get('mode');
-    const code = p.get('oobCode');
+  // Piccolo banner di stato
+  const banner = document.createElement('div');
+  banner.style.cssText = "margin-top:12px;color:#9aa0a6;font-size:13px";
+  banner.id = "verifyStatus";
+  document.querySelector('.panel')?.appendChild(banner);
 
-    (async () => {
-      if (mode === 'verifyEmail' && code) {
-        try {
-          await applyActionCode(auth, code); // ✅ segna l'email come verificata
-          // opzionale: dopo 1.5s vai alla home
-          // setTimeout(() => window.location.replace('/'), 1500);
-        } catch (e) {
-          // Se il link è già usato/scaduto non blocchiamo la UI "success"
-          console.warn('applyActionCode fallita o già usata:', e?.message || e);
-        }
+  const p = new URLSearchParams(location.search);
+  const mode = p.get('mode');
+  const code = p.get('oobCode');
+
+  async function run() {
+    try {
+      if (mode !== 'verifyEmail' || !code) {
+        banner.textContent = "Nessun codice di verifica nel link. Apri questa pagina dal link email.";
+        console.warn("Parametri assenti:", { mode, code });
+        return;
       }
-    })();
-  </script>
+      // 1) Verifica che il codice sia valido (debug utile)
+      await checkActionCode(auth, code);
+      // 2) Applica la verifica
+      await applyActionCode(auth, code);
+      banner.textContent = "✔ Email verificata. Puoi tornare all’app.";
+      console.log("applyActionCode: OK");
+    } catch (e) {
+      banner.textContent = "⚠ Non è stato possibile verificare il codice: " + (e?.message || e);
+      console.error("applyActionCode error:", e);
+    }
+  }
+  run();
+</script>
+
 </body>
 </html>
