@@ -137,5 +137,40 @@
 
     <footer>Il tuo team è sempre a disposizione! © INGEFIT</footer>
   </div>
+
+  <!-- ✅ Verifica effettiva del link (applica l'oobCode) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getAuth, applyActionCode } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+
+    // ⬇️ Inserisci la config del TUO progetto (stessa dell'app Android)
+    const firebaseConfig = {
+      apiKey: "TUO_API_KEY",
+      authDomain: "TUO_PROJECT_ID.firebaseapp.com",
+      projectId: "TUO_PROJECT_ID",
+      appId: "TUO_APP_ID"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    auth.languageCode = 'it';
+
+    const p = new URLSearchParams(location.search);
+    const mode = p.get('mode');
+    const code = p.get('oobCode');
+
+    (async () => {
+      if (mode === 'verifyEmail' && code) {
+        try {
+          await applyActionCode(auth, code); // ✅ segna l'email come verificata
+          // opzionale: dopo 1.5s vai alla home
+          // setTimeout(() => window.location.replace('/'), 1500);
+        } catch (e) {
+          // Se il link è già usato/scaduto non blocchiamo la UI "success"
+          console.warn('applyActionCode fallita o già usata:', e?.message || e);
+        }
+      }
+    })();
+  </script>
 </body>
 </html>
