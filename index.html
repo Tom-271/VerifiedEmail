@@ -3,186 +3,126 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Conferma email • INGEFIT</title>
-  <meta name="color-scheme" content="light dark">
+  <title>INGEFIT • Email verificata</title>
   <style>
-    /* palette */
-    :root {
-      --bg:#f6f7fb; --card:#fff; --txt:#222; --muted:#666;
-      --accent:#4f46e5;          /* per bottoni */
-      --purple200:#E9D5FF;       /* purple_200 richiesto per il titolo/linea */
+    :root{
+      --bg:#0b0d12; --txt:#e6e6e6; --muted:#9aa0a6;
+      --p200:#BB86FC;        /* viola titolo/linea/tagline */
+      --card:#12141a; --card-border:rgba(187,134,252,.25);
+      --chip:#1b1f2a;
     }
-    @media (prefers-color-scheme: dark){
-      :root { --bg:#0b0d12; --card:#12141a; --txt:#e6e6e6; --muted:#9aa0a6; }
-    }
-
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;background:var(--bg);
+    body{margin:0;background:var(--bg);color:var(--txt);
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      color:var(--txt);
-      padding:28px 22px 48px;
-    }
+      padding:32px 24px 64px}
+    .wrap{max-width:1100px;margin:0 auto}
 
-    /* intestazione in alto a sinistra */
-    .heroHead{
-      display:grid;
-      grid-template-columns:max-content 1fr;
-      grid-template-rows:auto auto;
-      column-gap:16px;
-      row-gap:4px;
-      align-items:end;
-      margin-bottom:24px;
-    }
-    .brand{
-      grid-column:1; grid-row:1;
-      font-size:32px; font-weight:900; letter-spacing:.08em;
-      color:var(--purple200);
-      text-transform:uppercase;
-      line-height:1;
-    }
-    .line{
-      grid-column:1; grid-row:2;
-      height:4px; background:var(--purple200);
-      border-radius:3px;
-    }
-    .tagline{
-      grid-column:2; grid-row:2;
-      align-self:end;
-      font-weight:800; letter-spacing:.02em;
-      color:var(--purple200);
-      text-transform:none;
-      white-space:nowrap;
-    }
+    /* header */
+    .hero{display:grid;grid-template-columns:max-content 1fr;grid-template-rows:auto auto;
+      column-gap:18px;row-gap:6px;align-items:end;margin-bottom:28px}
+    .brand{grid-column:1;grid-row:1;color:var(--p200);font-weight:900;letter-spacing:.06em;
+      text-transform:uppercase;line-height:.95;font-size:clamp(40px,9vw,104px)}
+    .line{grid-column:1;grid-row:2;height:6px;background:var(--p200);border-radius:4px}
+    .tagline{grid-column:2;grid-row:2;align-self:end;color:var(--p200);font-weight:800;
+      font-style:italic;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;
+      font-size:clamp(14px,2.2vw,20px)}
 
-    /* contenuto */
-    .wrap{
-      max-width:900px; margin:0 auto;
-    }
-    .panel{
-      background:var(--card);
-      border-radius:14px;
-      box-shadow:0 10px 30px rgba(0,0,0,.08);
-      padding:28px;
-      display:grid;
-      grid-template-columns:64px 1fr;
-      gap:18px;
-    }
-    .icon{
-      width:64px; height:64px; display:block;
-      color:var(--accent);
-    }
-    .title{font-size:22px;font-weight:800;margin:0 0 6px}
-    .msg{font-size:14px;line-height:1.7;color:var(--muted);margin:0 0 14px}
-    .bullets{margin:8px 0 0 0;padding:0 0 0 18px}
-    .bullets li{margin:6px 0; line-height:1.6}
+    /* pannello successo */
+    .panel{background:var(--card);border:1px solid var(--card-border);
+      border-radius:16px;padding:28px 26px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .title{font-size:28px;font-weight:900;margin:0 0 10px}
+    .lead{color:var(--muted);margin:0 0 18px;line-height:1.7}
+    .bullets{margin:6px 0 0 0;padding:0 0 0 18px}
+    .bullets li{margin:8px 0;line-height:1.7}
 
-    .cta{
-      margin-top:14px;
-      display:inline-flex; align-items:center; gap:8px;
-      padding:12px 18px; border-radius:10px; border:0;
-      background:var(--accent); color:#fff; font-weight:800; text-decoration:none;
-    }
-    .spinner{
-      width:24px;height:24px;border-radius:50%;
-      border:3px solid #0000;border-top-color:var(--accent);
-      animation:spin 1s linear infinite; margin-top:6px;
-    }
-    @keyframes spin{to{transform:rotate(360deg)}}
-
-    /* stati */
-    .hidden{display:none}
-
-    footer{margin-top:14px;font-size:12px;color:var(--muted);text-align:center}
+    /* PRO CARDS (stile “badge”) */
+    .proGrid{margin-top:22px;display:grid;gap:18px;
+      grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
+    .proCard{position:relative;background:var(--card);border-radius:18px;
+      border:2px solid rgba(187,134,252,.35);box-shadow:0 8px 28px rgba(0,0,0,.25);
+      padding:22px;text-align:center;overflow:hidden}
+    .proCard::after{content:"";position:absolute;inset:0;border-radius:18px;
+      box-shadow:0 0 0 6px rgba(187,134,252,.08) inset;pointer-events:none}
+    .avatar{width:72px;height:72px;border-radius:50%;margin:0 auto 10px;
+      display:grid;place-items:center;background:rgba(187,134,252,.12);color:var(--p200)}
+    .name{margin:6px 0 2px;font-weight:800;font-size:20px}
+    .role{margin:0;color:#cfcfe6;font-size:14px}
+    .sep{height:2px;background:rgba(187,134,252,.25);margin:14px auto 10px;width:70%}
+    .desc{margin:0;color:var(--muted);line-height:1.7;font-size:14px}
+    .social{display:flex;gap:12px;justify-content:center;margin-top:14px}
+    .social a{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:8px;
+      background:var(--chip);color:var(--p200);text-decoration:none;border:1px solid rgba(187,134,252,.25)}
+    .social a:hover{filter:brightness(1.08)}
+    footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
   </style>
 </head>
 <body>
-  <!-- HEADER -->
-  <header class="heroHead wrap">
-    <div class="brand">INGEFIT</div>
-    <div class="line"></div>
-    <div class="tagline">pronto ad allenarti?</div>
-  </header>
+  <div class="wrap">
+    <header class="hero">
+      <div class="brand">INGEFIT</div>
+      <div class="line"></div>
+      <div class="tagline">PRONTO AD ALLENARTI?</div>
+    </header>
 
-  <!-- PANEL -->
-  <main class="wrap">
-    <section id="panel" class="panel">
-      <!-- icona -->
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="12" r="10" opacity=".12" fill="currentColor"></circle>
-        <path d="M16.7 8.7a1 1 0 0 0-1.4-1.4L10 12.6 8.7 11.3a1 1 0 1 0-1.4 1.4l2 2a1 1 0 0 0 1.4 0l6-6Z" fill="currentColor"></path>
-      </svg>
+    <section class="panel">
+      <h1 class="title">Email verificata con successo ✅</h1>
+      <p class="lead">
+        Il tuo account è stato verificato e la tua mail è attiva. Da questo momento hai accesso completo all’ecosistema INGEFIT.
+      </p>
+      <ul class="bullets">
+        <li><strong>Siamo lieti di averti con noi!</strong> Il tuo profilo è pronto per partire.</li>
+        <li><strong>Sicurezza prima di tutto:</strong> la verifica serve a controllare che sia proprio tu il proprietario della mail.</li>
+        <li><strong>Adesso si fa sul serio:</strong> imposta i tuoi obiettivi, crea i piani di allenamento e inizia ad allenarti.</li>
+      </ul>
 
-      <!-- testo dinamico -->
-      <div>
-        <h1 id="title" class="title">Verifica in corso…</h1>
-        <p id="msg" class="msg">Stiamo confermando il tuo indirizzo email. Attendi qualche secondo.</p>
-        <div id="spin" class="spinner"></div>
+      <!-- SOLO DUE CARDS: PT e NUTRIZIONISTA -->
+      <div class="proGrid" aria-label="Professionisti a tua disposizione">
+        <!-- PT -->
+        <article class="proCard">
+          <div class="avatar" aria-hidden="true">
+            <!-- silhouette manubrio -->
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="3" y="9" width="2" height="6" rx="1"></rect>
+              <rect x="6" y="8" width="2" height="8" rx="1"></rect>
+              <rect x="10" y="11" width="4" height="2" rx="1"></rect>
+              <rect x="16" y="8" width="2" height="8" rx="1"></rect>
+              <rect x="19" y="9" width="2" height="6" rx="1"></rect>
+            </svg>
+          </div>
+          <h3 class="name">Personal Trainer</h3>
+          <p class="role">Programmazione • Tecnica • Motivazione</p>
+          <div class="sep"></div>
+          <p class="desc">
+            Allenamenti su misura e progressioni efficaci, con attenzione alla tecnica e alla costanza.
+            Professionisti certificati pronti ad affiancarti 1:1.
+          </p>
+          <div class="social" aria-label="Contatti">
+          
+          </div>
+        </article>
 
-        <!-- contenuto “pieno” che compare al successo -->
-        <ul id="bullets" class="bullets hidden">
-          <li><strong>Il tuo account è stato verificato</strong> e la tua email funziona correttamente.</li>
-          <li><strong>Siamo lieti di averti con noi!</strong> Da ora l’accesso e le notifiche saranno ancora più sicuri.</li>
-          <li>Personalizza il tuo profilo, imposta i tuoi obiettivi e <em>inizia ad allenarti</em> con INGEFIT.</li>
-        </ul>
-
-        <a id="btn" class="cta hidden" href="/">Apri l’app</a>
+        <!-- NUTRIZIONISTA -->
+        <article class="proCard">
+          <div class="avatar" aria-hidden="true">
+            <!-- silhouette mela -->
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 7c2.2-1.6 2.4-4 1-5 0 0 2.5-.2 3.8 1.6 1.2 1.7.6 3.7-.8 4.9 2.5 1 4 3.4 4 6.1 0 4.1-3.3 7.4-7.4 7.4S5.2 18.7 5.2 14.6c0-2.7 1.6-5.1 4.1-6.1C9.9 8.1 10.9 8.4 12 9c1.1-.6 2.1-.9 2.7-1.5-.9-.1-1.9-.3-2.7-.5z"></path>
+              <path d="M8.8 4.3c1.1 1.1 3 .9 3 .9s-.2-1.9-.9-2.9C10 1.2 8.7.8 7.7 1.5 6.7 2.2 7.7 3.2 8.8 4.3z"></path>
+            </svg>
+          </div>
+          <h3 class="name">Nutrizionista</h3>
+          <p class="role">Educazione alimentare • Piani su misura</p>
+          <div class="sep"></div>
+          <p class="desc">
+            Strategie nutrizionali personalizzate per performance, benessere e ricomposizione.
+            Monitoraggio periodico e aggiustamenti chiari.
+          </p>
+         
+        </article>
       </div>
     </section>
 
-    <footer>© INGEFIT</footer>
-  </main>
-
-  <!-- Firebase (moduli) -->
-  <script type="module">
-    // Sostituisci con la config del tuo progetto
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-    import { getAuth, applyActionCode } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "TUO_API_KEY",
-      authDomain: "TUO_PROJECT_ID.firebaseapp.com",
-      projectId: "TUO_PROJECT_ID",
-      appId: "TUO_APP_ID"
-    };
-
-    const app  = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    auth.languageCode = 'it';
-
-    const $ = (id)=>document.getElementById(id);
-    const params = new URLSearchParams(location.search);
-    const mode   = params.get('mode');
-    const code   = params.get('oobCode');
-
-    function showSuccess(){
-      $('title').textContent = 'Email verificata con successo';
-      $('msg').textContent   = 'Grazie! Il tuo indirizzo è stato confermato. Ora puoi accedere.';
-      $('spin').classList.add('hidden');
-      $('bullets').classList.remove('hidden');
-      $('btn').classList.remove('hidden');
-    }
-
-    function showError(e){
-      $('title').textContent = 'Verifica non riuscita';
-      $('msg').textContent   = (e && e.message) ? e.message : 'Il link potrebbe essere scaduto o già usato.';
-      $('spin').classList.add('hidden');
-      const btn = $('btn');
-      btn.classList.remove('hidden');
-      btn.textContent = 'Richiedi nuovo link';
-      btn.href = '/';
-    }
-
-    (async () => {
-      try{
-        if (mode !== 'verifyEmail' || !code) throw new Error('Link non valido o incompleto.');
-        await applyActionCode(auth, code);
-        showSuccess();
-      }catch(e){
-        showError(e);
-      }
-    })();
-  </script>
+    <footer>Il tuo team è sempre a disposizione! © INGEFIT</footer>
+  </div>
 </body>
 </html>
