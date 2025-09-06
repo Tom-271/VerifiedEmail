@@ -3,50 +3,140 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Conferma email • La tua App</title>
+  <title>Conferma email • INGEFIT</title>
   <meta name="color-scheme" content="light dark">
   <style>
-    :root { --bg:#f6f7fb; --card:#fff; --txt:#222; --muted:#666; --accent:#4f46e5; }
+    /* palette */
+    :root {
+      --bg:#f6f7fb; --card:#fff; --txt:#222; --muted:#666;
+      --accent:#4f46e5;          /* per bottoni */
+      --purple200:#E9D5FF;       /* purple_200 richiesto per il titolo/linea */
+    }
     @media (prefers-color-scheme: dark){
       :root { --bg:#0b0d12; --card:#12141a; --txt:#e6e6e6; --muted:#9aa0a6; }
     }
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--txt);display:grid;place-items:center;padding:24px}
-    .card{width:min(640px,94vw);background:var(--card);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.08);padding:28px;text-align:center}
-    .icon{width:64px;height:64px;margin:6px auto 12px;display:block}
-    .title{font-size:22px;font-weight:800;margin:2px 0 8px}
-    .msg{font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 18px}
-    .btn{display:none;align-items:center;gap:8px;justify-content:center;padding:12px 18px;border-radius:10px;border:0;background:var(--accent);color:#fff;font-weight:700;text-decoration:none}
-    .spinner{width:24px;height:24px;border-radius:50%;border:3px solid #0000;border-top-color:var(--accent);animation:spin 1s linear infinite;margin:10px auto}
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;background:var(--bg);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      color:var(--txt);
+      padding:28px 22px 48px;
+    }
+
+    /* intestazione in alto a sinistra */
+    .heroHead{
+      display:grid;
+      grid-template-columns:max-content 1fr;
+      grid-template-rows:auto auto;
+      column-gap:16px;
+      row-gap:4px;
+      align-items:end;
+      margin-bottom:24px;
+    }
+    .brand{
+      grid-column:1; grid-row:1;
+      font-size:32px; font-weight:900; letter-spacing:.08em;
+      color:var(--purple200);
+      text-transform:uppercase;
+      line-height:1;
+    }
+    .line{
+      grid-column:1; grid-row:2;
+      height:4px; background:var(--purple200);
+      border-radius:3px;
+    }
+    .tagline{
+      grid-column:2; grid-row:2;
+      align-self:end;
+      font-weight:800; letter-spacing:.02em;
+      color:var(--purple200);
+      text-transform:none;
+      white-space:nowrap;
+    }
+
+    /* contenuto */
+    .wrap{
+      max-width:900px; margin:0 auto;
+    }
+    .panel{
+      background:var(--card);
+      border-radius:14px;
+      box-shadow:0 10px 30px rgba(0,0,0,.08);
+      padding:28px;
+      display:grid;
+      grid-template-columns:64px 1fr;
+      gap:18px;
+    }
+    .icon{
+      width:64px; height:64px; display:block;
+      color:var(--accent);
+    }
+    .title{font-size:22px;font-weight:800;margin:0 0 6px}
+    .msg{font-size:14px;line-height:1.7;color:var(--muted);margin:0 0 14px}
+    .bullets{margin:8px 0 0 0;padding:0 0 0 18px}
+    .bullets li{margin:6px 0; line-height:1.6}
+
+    .cta{
+      margin-top:14px;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:12px 18px; border-radius:10px; border:0;
+      background:var(--accent); color:#fff; font-weight:800; text-decoration:none;
+    }
+    .spinner{
+      width:24px;height:24px;border-radius:50%;
+      border:3px solid #0000;border-top-color:var(--accent);
+      animation:spin 1s linear infinite; margin-top:6px;
+    }
     @keyframes spin{to{transform:rotate(360deg)}}
-    [data-status="success"] .success{display:block}
-    [data-status="error"] .error{display:block}
-    .success,.error{display:none}
-    footer{margin-top:10px;font-size:12px;color:var(--muted)}
+
+    /* stati */
+    .hidden{display:none}
+
+    footer{margin-top:14px;font-size:12px;color:var(--muted);text-align:center}
   </style>
 </head>
 <body>
-  <main id="state" class="card" data-status="">
-    <!-- icona dinamica -->
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2Z" opacity=".12"/>
-      <path id="glyph" fill="currentColor" d="M16.7 8.7a1 1 0 0 0-1.4-1.4L10 12.6 8.7 11.3a1 1 0 1 0-1.4 1.4l2 2a1 1 0 0 0 1.4 0l6-6Z"/>
-    </svg>
+  <!-- HEADER -->
+  <header class="heroHead wrap">
+    <div class="brand">INGEFIT</div>
+    <div class="line"></div>
+    <div class="tagline">pronto ad allenarti?</div>
+  </header>
 
-    <h1 id="title" class="title">Verifica in corso...</h1>
-    <p id="msg" class="msg">Stiamo confermando il tuo indirizzo email. Attendi qualche secondo.</p>
-    <div class="spinner" id="spin"></div>
+  <!-- PANEL -->
+  <main class="wrap">
+    <section id="panel" class="panel">
+      <!-- icona -->
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" opacity=".12" fill="currentColor"></circle>
+        <path d="M16.7 8.7a1 1 0 0 0-1.4-1.4L10 12.6 8.7 11.3a1 1 0 1 0-1.4 1.4l2 2a1 1 0 0 0 1.4 0l6-6Z" fill="currentColor"></path>
+      </svg>
 
-    <a id="btn" class="btn" href="/">Apri l’app</a>
+      <!-- testo dinamico -->
+      <div>
+        <h1 id="title" class="title">Verifica in corso…</h1>
+        <p id="msg" class="msg">Stiamo confermando il tuo indirizzo email. Attendi qualche secondo.</p>
+        <div id="spin" class="spinner"></div>
 
-    <div class="success"></div>
-    <div class="error"></div>
-    <footer>© La tua App</footer>
+        <!-- contenuto “pieno” che compare al successo -->
+        <ul id="bullets" class="bullets hidden">
+          <li><strong>Il tuo account è stato verificato</strong> e la tua email funziona correttamente.</li>
+          <li><strong>Siamo lieti di averti con noi!</strong> Da ora l’accesso e le notifiche saranno ancora più sicuri.</li>
+          <li>Personalizza il tuo profilo, imposta i tuoi obiettivi e <em>inizia ad allenarti</em> con INGEFIT.</li>
+        </ul>
+
+        <a id="btn" class="cta hidden" href="/">Apri l’app</a>
+      </div>
+    </section>
+
+    <footer>© INGEFIT</footer>
   </main>
 
   <!-- Firebase (moduli) -->
   <script type="module">
-    //commento: configura Firebase del tuo progetto
+    // Sostituisci con la config del tuo progetto
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
     import { getAuth, applyActionCode } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
@@ -66,30 +156,33 @@
     const mode   = params.get('mode');
     const code   = params.get('oobCode');
 
-    async function run(){
-      try{
-        if (mode !== 'verifyEmail' || !code) throw new Error('Link non valido o incompleto.');
-        await applyActionCode(auth, code); //commento: applica la verifica
-        //commento: UI successo
-        $('title').textContent = 'Email verificata con successo';
-        $('msg').textContent   = 'Grazie! Il tuo indirizzo è stato confermato. Ora puoi accedere.';
-        $('state').dataset.status = 'success';
-        $('spin').style.display = 'none';
-        $('btn').style.display  = 'inline-flex';
-      }catch(e){
-        //commento: UI errore
-        $('title').textContent = 'Verifica non riuscita';
-        $('msg').textContent   = (e && e.message) ? e.message : 'Il link potrebbe essere scaduto o già usato.';
-        $('state').dataset.status = 'error';
-        $('spin').style.display = 'none';
-        const btn = $('btn');
-        btn.style.display = 'inline-flex';
-        btn.textContent = 'Richiedi nuovo link';
-        btn.href = '/'; //commento: cambia con la tua pagina di re-invio
-      }
+    function showSuccess(){
+      $('title').textContent = 'Email verificata con successo';
+      $('msg').textContent   = 'Grazie! Il tuo indirizzo è stato confermato. Ora puoi accedere.';
+      $('spin').classList.add('hidden');
+      $('bullets').classList.remove('hidden');
+      $('btn').classList.remove('hidden');
     }
 
-    run();
+    function showError(e){
+      $('title').textContent = 'Verifica non riuscita';
+      $('msg').textContent   = (e && e.message) ? e.message : 'Il link potrebbe essere scaduto o già usato.';
+      $('spin').classList.add('hidden');
+      const btn = $('btn');
+      btn.classList.remove('hidden');
+      btn.textContent = 'Richiedi nuovo link';
+      btn.href = '/';
+    }
+
+    (async () => {
+      try{
+        if (mode !== 'verifyEmail' || !code) throw new Error('Link non valido o incompleto.');
+        await applyActionCode(auth, code);
+        showSuccess();
+      }catch(e){
+        showError(e);
+      }
+    })();
   </script>
 </body>
 </html>
