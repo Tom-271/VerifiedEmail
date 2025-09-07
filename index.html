@@ -138,55 +138,188 @@
     <footer>Il tuo team è sempre a disposizione! © INGEFIT</footer>
   </div>
 
- <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-  import { getAuth, checkActionCode, applyActionCode } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+<script type="module">
+  import {
+    initializeApp
+  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import {
+    getAuth,
+    checkActionCode,
+    applyActionCode,
+    verifyPasswordResetCode,
+    confirmPasswordReset
+  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
 
-  // ⚠️ USA la config del progetto dove crei gli utenti (stessa dell'app Android)
-  // Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyD44-_QQ63SD-JVBGm2AwtPCl1ahHD2FrQ",
-  authDomain: "esame-9aa37.firebaseapp.com",
-  projectId: "esame-9aa37",
-  storageBucket: "esame-9aa37.firebasestorage.app",
-  messagingSenderId: "1041503427752",
-  appId: "1:1041503427752:web:337b2e422ba5f895a2f69d"
-};
+  // ⚠️ stessa config del progetto Android
+  const firebaseConfig = {
+    apiKey: "AIzaSyD44-_QQ63SD-JVBGm2AwtPCl1ahHD2FrQ",
+    authDomain: "esame-9aa37.firebaseapp.com",
+    projectId: "esame-9aa37",
+    storageBucket: "esame-9aa37.firebasestorage.app",
+    messagingSenderId: "1041503427752",
+    appId: "1:1041503427752:web:337b2e422ba5f895a2f69d"
+  };
 
   const app  = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   auth.languageCode = 'it';
 
-  // Piccolo banner di stato
-  const banner = document.createElement('div');
-  banner.style.cssText = "margin-top:12px;color:#9aa0a6;font-size:13px";
-  banner.id = "verifyStatus";
-  document.querySelector('.panel')?.appendChild(banner);
+  const qs = new URLSearchParams(location.search);
+  const mode = qs.get('mode');
+  const code = qs.get('oobCode');
+  const continueUrl = qs.get('continueUrl') ? decodeURIComponent(qs.get('continueUrl')) : null;
 
-  const p = new URLSearchParams(location.search);
-  const mode = p.get('mode');
-  const code = p.get('oobCode');
+  const panel = document.querySelector('.panel');
 
-  async function run() {
-    try {
-      if (mode !== 'verifyEmail' || !code) {
-        banner.textContent = "Nessun codice di verifica nel link. Apri questa pagina dal link email.";
-        console.warn("Parametri assenti:", { mode, code });
-        return;
-      }
-      // 1) Verifica che il codice sia valido (debug utile)
-      await checkActionCode(auth, code);
-      // 2) Applica la verifica
-      await applyActionCode(auth, code);
-      banner.textContent = "✔ Email verificata. Puoi tornare all’app.";
-      console.log("applyActionCode: OK");
-    } catch (e) {
-      banner.textContent = "⚠ Non è stato possibile verificare il codice: " + (e?.message || e);
-      console.error("applyActionCode error:", e);
+  function setTitle(t){ document.title = `INGEFIT • ${t}`; }
+  function setTagline(t){ const tg = document.querySelector('.tagline'); if(tg) tg.textContent = t; }
+
+  function renderVerifySuccess(){
+    setTitle('Email verificata');
+    setTagline('PRONTO AD ALLENARTI?');
+    // aggiunge banner di stato in fondo alla card
+    const banner = document.createElement('div');
+    banner.style.cssText = "margin-top:12px;color:#9aa0a6;font-size:13px";
+    banner.textContent = "✔ Email verificata. Puoi tornare all’app.";
+    panel.appendChild(banner);
+    if(continueUrl){
+      const a = document.createElement('a');
+      a.href = continueUrl;
+      a.textContent = "Torna all’app";
+      a.style.cssText = "display:inline-block;margin-top:12px;padding:10px 14px;border-radius:10px;border:1px solid rgba(187,134,252,.35);background:#1b1f2a;color:#BB86FC;text-decoration:none;font-weight:800";
+      panel.appendChild(a);
     }
   }
+
+  function renderRecoverSuccess(oldEmail, newEmail){
+    setTitle('Email ripristinata');
+    setTagline('ACCOUNT RECUPERATO');
+    panel.innerHTML = `
+      <h1 class="title">Email ripristinata ✅</h1>
+      <p class="lead">Il tuo indirizzo è stato riportato da <strong>${newEmail || ''}</strong> a <strong>${oldEmail || ''}</strong>.</p>
+    `;
+    if(continueUrl){
+      panel.insertAdjacentHTML('beforeend',
+        `<a href="${continueUrl}" style="display:inline-block;margin-top:12px;padding:10px 14px;border-radius:10px;border:1px solid rgba(187,134,252,.35);background:#1b1f2a;color:#BB86FC;text-decoration:none;font-weight:800">Torna all’app</a>`);
+    }
+  }
+
+  function renderResetForm(email){
+    setTitle('Reimposta password');
+    setTagline('SICUREZZA DELL’ACCOUNT');
+
+    panel.innerHTML = `
+      <h1 class="title">Reimposta la password</h1>
+      <p class="lead">Stai reimpostando la password per <strong>${email || ''}</strong>.</p>
+
+      <div class="formRow" style="margin-top:10px">
+        <label for="newPass" style="display:block;margin:8px 0 6px">Nuova password</label>
+        <input id="newPass" type="password" autocomplete="new-password"
+               style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(187,134,252,.25);background:#0b0d12;color:#e6e6e6">
+      </div>
+
+      <div class="formRow" style="margin-top:10px">
+        <label for="newPass2" style="display:block;margin:8px 0 6px">Conferma password</label>
+        <input id="newPass2" type="password" autocomplete="new-password"
+               style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(187,134,252,.25);background:#0b0d12;color:#e6e6e6">
+      </div>
+
+      <button id="btnConfirm" style="margin-top:14px;padding:12px 16px;border-radius:12px;border:1px solid rgba(187,134,252,.35);background:#1b1f2a;color:#BB86FC;font-weight:900;cursor:pointer">
+        Imposta password
+      </button>
+
+      <div id="resetMsg" style="margin-top:12px;color:#9aa0a6;font-size:13px"></div>
+    `;
+
+    const btn = document.getElementById('btnConfirm');
+    const msg = document.getElementById('resetMsg');
+
+    btn.addEventListener('click', async () => {
+      const p1 = /** @type {HTMLInputElement} */(document.getElementById('newPass')).value.trim();
+      const p2 = /** @type {HTMLInputElement} */(document.getElementById('newPass2')).value.trim();
+
+      // controlli base
+      if(!p1 || !p2){ msg.textContent = "Inserisci e conferma la nuova password."; return; }
+      if(p1 !== p2){ msg.textContent = "Le password non coincidono."; return; }
+      if(p1.length < 6){ msg.textContent = "La password deve avere almeno 6 caratteri."; return; }
+
+      btn.disabled = true; msg.textContent = "Salvataggio in corso…";
+
+      try{
+        await confirmPasswordReset(auth, code, p1);
+        msg.textContent = "✔ Password aggiornata. Ora puoi accedere con le nuove credenziali.";
+        if(continueUrl){
+          const a = document.createElement('a');
+          a.href = continueUrl;
+          a.textContent = "Torna all’app";
+          a.style.cssText = "display:inline-block;margin-top:10px;padding:10px 14px;border-radius:10px;border:1px solid rgba(187,134,252,.35);background:#1b1f2a;color:#BB86FC;text-decoration:none;font-weight:800";
+          panel.appendChild(a);
+        }
+      }catch(e){
+        console.error(e);
+        btn.disabled = false;
+        msg.textContent = "⚠ Impossibile aggiornare la password: " + (e?.message || e);
+      }
+    });
+  }
+
+  async function run(){
+    try{
+      if(!mode || !code){
+        setTitle('Link non valido');
+        document.querySelector('.tagline')?.remove();
+        panel.innerHTML = `
+          <h1 class="title">Link non valido ❌</h1>
+          <p class="lead">Apri questa pagina dal link ricevuto via email.</p>
+        `;
+        return;
+      }
+
+      // smista per modalità
+      if(mode === 'verifyEmail'){
+        await checkActionCode(auth, code);     // debug/validità
+        await applyActionCode(auth, code);     // applica verifica
+        renderVerifySuccess();
+        return;
+      }
+
+      if(mode === 'resetPassword'){
+        // verifica subito il codice e ricava la mail
+        const email = await verifyPasswordResetCode(auth, code);
+        renderResetForm(email);
+        return;
+      }
+
+      if(mode === 'recoverEmail'){
+        // checkActionCode → contiene dati con email(s)
+        const info = await checkActionCode(auth, code);
+        await applyActionCode(auth, code);
+        const restored = info?.data?.email;     // email ripristinata
+        const prev = info?.data?.previousEmail; // se disponibile
+        renderRecoverSuccess(restored, prev);
+        return;
+      }
+
+      // fallback
+      setTitle('Operazione non supportata');
+      panel.innerHTML = `
+        <h1 class="title">Operazione non supportata</h1>
+        <p class="lead">Modalità sconosciuta: <code>${mode}</code>.</p>
+      `;
+    }catch(e){
+      console.error(e);
+      setTitle('Errore');
+      panel.innerHTML = `
+        <h1 class="title">Si è verificato un errore</h1>
+        <p class="lead">Dettagli: ${(e && e.message) || e}</p>
+        <p class="lead">Richiedi un nuovo link e riprova.</p>
+      `;
+    }
+  }
+
   run();
 </script>
+
 
 </body>
 </html>
